@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Mussabaheen/GRPC_GO/config"
+	"github.com/Mussabaheen/GRPC_GO/pkg/config"
 )
 
 func main() {
