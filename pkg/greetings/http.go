@@ -3,6 +3,8 @@ package greetings
 import (
 	"net/http"
 
+	httputil "github.com/Mussabaheen/GRPC_GO/pkg/httputil"
+
 	"github.com/gorilla/mux"
 )
 
@@ -21,5 +23,9 @@ func (gc *GretingsController) RegisterRoutes(r *mux.Router) {
 }
 
 func (gc *GretingsController) sayHelloEndpoint(rw http.ResponseWriter, r *http.Request) {
-	gc.service.SayHello()
+	resp, err := gc.service.SayHello()
+	if err != nil {
+		httputil.RespondWithError(rw, 400, err.Error())
+	}
+	httputil.RespondWithJSON(rw, 200, resp)
 }

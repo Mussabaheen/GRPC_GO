@@ -1,20 +1,35 @@
 package greetings
 
 import (
+	"context"
 	"fmt"
+
+	sh "github.com/Mussabaheen/GRPC_GO/hellodev"
+	"google.golang.org/grpc"
 )
 
 type Service interface {
-	SayHello()
+	SayHello() (*sh.HelloReply, error)
 }
 
-type service struct{}
-
-func NewService() Service {
-	return &service{}
+type service struct {
+	grpc grpc.ClientConn
 }
 
-func (s *service) SayHello() {
+func NewService(conn grpc.ClientConn) Service {
+	return &service{
+		grpc: conn,
+	}
+}
+
+func (s *service) SayHello() (*sh.HelloReply, error) {
 	fmt.Println("Hello World")
-
+	greeterClient := sh.NewGreeterClient(&s.grpc)
+	resp, err := greeterClient.SayHello(context.TODO(), &sh.HelloRequest{
+		Name: "Malik Mussabeheen",
+	})
+	if err != nil {
+		return &sh.HelloReply{}, err
+	}
+	return resp, nil
 }

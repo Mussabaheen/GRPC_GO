@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,12 @@ import (
 	"github.com/Mussabaheen/GRPC_GO/pkg/config"
 	"github.com/Mussabaheen/GRPC_GO/pkg/greetings"
 	"github.com/gorilla/mux"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+)
+
+var (
+	addr = flag.String("addr", "localhost:50051", "the address to connect to")
 )
 
 func main() {
@@ -21,12 +28,18 @@ func main() {
 		log.Fatal("Could not load config:", err)
 	}
 	r := mux.NewRouter()
-	greetingsController := greetings.NewController(greetings.NewService())
+	conn, err := grpc.Dial(*addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
+	greetingsService := greetings.NewService(*conn)
+	greetingsController := greetings.NewController(greetingsService)
 	greetingsController.RegisterRoutes(r)
 	port := config.Global.Port
 	fmt.Println("Starting server :", port)
-	err := http.ListenAndServe("localhost:3028", r)
+	err = http.ListenAndServe("localhost:3028", r)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
+
 }
