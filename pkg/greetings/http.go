@@ -11,12 +11,15 @@ type GretingsController struct {
 }
 
 func NewController(service Service) *GretingsController {
-	return &GretingsController{}
+	return &GretingsController{
+		service: service,
+	}
 }
 
 func (gc *GretingsController) RegisterRoutes(r *mux.Router) {
-	r.HandleFunc("/sayHello", gc.sayHelloEndpoint).Methods("GET")
+	r.HandleFunc("/sayhello", gc.sayHelloEndpoint).Methods("GET")
 }
 
 func (gc *GretingsController) sayHelloEndpoint(rw http.ResponseWriter, r *http.Request) {
+	gc.service.SayHello()
 }
